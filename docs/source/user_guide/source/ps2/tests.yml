@@ -1,0 +1,15 @@
+setup: "library(digest);library(testthat)"
+hash: 'digest(paste({{snippet}}, "{{salt}}"))'
+dispatch: "class({{snippet}})"
+normalize: 'toString({{snippet}})'
+check: "test_that('{{message}}', {expect_equal({{snippet}}, '{{value}}')})"
+success: "print('Success!')"
+templates:
+    default: 
+        - test: "{{snippet}}"
+          fail: "Value not correct."
+    numeric:
+        - test: "round({{snippet}})"
+          fail: "Value rounded to two decimals not correct"
+    
+
