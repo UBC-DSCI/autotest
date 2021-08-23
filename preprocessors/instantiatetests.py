@@ -101,11 +101,13 @@ class InstantiateTests(Execute):
 
     comment_strs = {
         'ir' : '#',
-        'python' : '#'
+		'python' : '#',
+        'python3' : '#'
     }
 
     sanitizers = {
         'ir' : lambda s : re.sub(r'\[\d+\]\s+', '', s).strip('"').strip("'"),
+        'python' : lambda s : s.strip('"').strip("'"),
         'python3' : lambda s : s.strip('"').strip("'")
     }
 
