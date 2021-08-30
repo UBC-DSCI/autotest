@@ -15,5 +15,6 @@ Or, if you use [Anaconda](https://www.anaconda.com/)
   conda install jupyter
   conda install -c conda-forge nbgrader
   ```
-3. Clone this repository to local:
-4. Execute `./install_autotest.sh` under the root of this repository, it will automatically install `autotest generation` module over the nbgrader package
+3. Activate this virtual enviroment
+4. Clone this repository to local
+5. Execute `./install_autotest.sh` under the root of this repository, it will automatically install `autotest generation` module over the nbgrader package
