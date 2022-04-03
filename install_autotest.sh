@@ -8,5 +8,6 @@ echo $nbgrader_path
 
 cp converters/generate_assignment.py $nbgrader_path/nbgrader/converters
 cp preprocessors/instantiatetests.py $nbgrader_path/nbgrader/preprocessors
+cp preprocessors/limittestcellheights.py $nbgrader_path/nbgrader/preprocessors
 cp preprocessors/__init__.py $nbgrader_path/nbgrader/preprocessors
 cp preprocessors/execute.py $nbgrader_path/nbgrader/preprocessors
