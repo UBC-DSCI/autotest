@@ -11,3 +11,5 @@ cp preprocessors/instantiatetests.py $nbgrader_path/nbgrader/preprocessors
 cp preprocessors/limittestcellheights.py $nbgrader_path/nbgrader/preprocessors
 cp preprocessors/__init__.py $nbgrader_path/nbgrader/preprocessors
 cp preprocessors/execute.py $nbgrader_path/nbgrader/preprocessors
+
+cp -r nbextensions/limit_cell_height $nbgrader_path/nbgrader/nbextensions
