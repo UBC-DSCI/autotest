@@ -18,3 +18,9 @@ Or, if you use [Anaconda](https://www.anaconda.com/)
 3. Activate this virtual enviroment
 4. Clone this repository to local
 5. Execute `./install_autotest.sh` under the root of this repository, it will automatically install `autotest generation` module over the nbgrader package
+6. Install extensions
+  ```bash
+    jupyter nbextension install --sys-prefix --py nbgrader --overwrite
+    jupyter nbextension enable --sys-prefix --py nbgrader
+    jupyter serverextension enable --sys-prefix --py nbgrader
+  ```
