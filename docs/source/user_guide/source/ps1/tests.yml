@@ -6,7 +6,7 @@ check: "assert {{snippet}} == '{{value}}', '{{message}}'"
 success: "print('Success!')"
 
 templates:
-    default: 
+    default:
         - test: "{{snippet}}"
           fail: "Value not correct."
 
@@ -45,7 +45,7 @@ templates:
           fail: "values do not match."
 
         - test: "{{snippet}}"
-          fail: "Order of elements do not match."	# may not matter can be ignored
+          fail: "Order of elements do not match."
 
     str:
 
@@ -63,15 +63,15 @@ templates:
         - test: "type({{snippet}})"
           fail: "return type is not dict"
 
-    - test: "len(list({{snippet}}.keys()))"
-      fail: "number of keys are not matching"
+        - test: "len(list({{snippet}}.keys()))"
+          fail: "number of keys are not matching"
 
-    - test: "sorted(list({{snippet}}.keys()))"
-      fail: "keys are not matching"
+        - test: "sorted(list({{snippet}}.keys()))"
+          fail: "keys are not matching"
 
-    - test: "sorted(list({{snippet}}.values()))"
-      fail: "values are not matching"
+        - test: "sorted(list({{snippet}}.values()))"
+          fail: "values are not matching"
 
-    - test: "{{snippet}}"
-      fail: "results are not matching"
+        - test: "{{snippet}}"
+          fail: "results are not matching"
 
