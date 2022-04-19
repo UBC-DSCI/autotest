@@ -7,71 +7,93 @@ success: "print('Success!')"
 
 templates:
     default:
+        - test: "type({{snippet}})"
+          fail: "type is not correct"
+
         - test: "{{snippet}}"
-          fail: "Value not correct."
+          fail: "value is not correct."
 
     int:
         - test: "type({{snippet}})"
-          fail: "return type is not int"
+          fail: "type is not int"
 
         - test: "{{snippet}}"
-          fail: "Value not correct."
+          fail: "value is not correct."
 
     float:
         - test: "type({{snippet}})"
-          fail: "return type is not float"
+          fail: "type is not float"
 
         - test: "round({{snippet}}, 3)"
-          fail: "Value neither correct nor close."
+          fail: "value neither correct nor close"
 
     set:
         - test: "type({{snippet}})"
-          fail: "return type is not set"
+          fail: "type is not set"
 
         - test: "len({{snippet}})"
-          fail: "Length does not match."
+          fail: "length is not correct"
 
         - test: "{{snippet}}"
-          fail: "Value not correct."
+          fail: "value is not correct"
 
     list:
         - test: "type({{snippet}})"
-          fail: "return type is not list"
+          fail: "type is not list"
 
         - test: "len({{snippet}})"
-          fail: "Length does not match."
+          fail: "length is not correct"
 
         - test: "sorted({{snippet}})"
-          fail: "values do not match."
+          fail: "values are not correct"
 
         - test: "{{snippet}}"
-          fail: "Order of elements do not match."
+          fail: "order of elements are not correct"
+
+    tuple:
+        - test: "type({{snippet}})"
+          fail: "type is not tuple"
+
+        - test: "len({{snippet}})"
+          fail: "length is not correct"
+
+        - test: "sorted({{snippet}})"
+          fail: "values are not correct"
+
+        - test: "{{snippet}}"
+          fail: "order of elements are not correct"
 
     str:
 
         - test: "type({{snippet}})"
-          fail: "return type is not str"
+          fail: "type is not str"
 
         - test: "len({{snippet}})"
-          fail: "length not correct"
+          fail: "length is not correct"
 
         - test: "{{snippet}}"
-          fail: "incorrect value"
+          fail: "value is not correct"
 
     dict:
 
         - test: "type({{snippet}})"
-          fail: "return type is not dict"
+          fail: "type is not dict"
 
         - test: "len(list({{snippet}}.keys()))"
-          fail: "number of keys are not matching"
+          fail: "number of keys is not correct"
 
         - test: "sorted(list({{snippet}}.keys()))"
-          fail: "keys are not matching"
+          fail: "keys are not correct"
 
         - test: "sorted(list({{snippet}}.values()))"
-          fail: "values are not matching"
+          fail: "values are not correct"
 
         - test: "{{snippet}}"
-          fail: "results are not matching"
+          fail: "not correct"
 
+    bool:
+        - test: "type({{snippet}})"
+          fail: "type is not bool"
+
+        - test: "{{snippet}}"
+          fail: "value is not correct"
