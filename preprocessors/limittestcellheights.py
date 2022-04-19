@@ -7,7 +7,7 @@ class LimitTestCellHeights(NbGraderPreprocessor):
     """A preprocessor for making test cells not be too large."""
 
     test_cell_height = Integer(
-        2,
+        100,
         help="Max height of a test cell"
     ).tag(config=True)
 
