@@ -25,7 +25,7 @@ templates:
           fail: "type is not float"
 
         - test: "round({{snippet}}, 5)"
-          fail: "value neither correct nor close"
+          fail: "value is not correct (rounded to 5 decimal places)"
 
     set:
         - test: "type({{snippet}})"
@@ -48,7 +48,7 @@ templates:
           fail: "values are not correct"
 
         - test: "{{snippet}}"
-          fail: "order of elements are not correct"
+          fail: "order of elements is not correct"
 
     tuple:
         - test: "type({{snippet}})"
@@ -61,7 +61,7 @@ templates:
           fail: "values are not correct"
 
         - test: "{{snippet}}"
-          fail: "order of elements are not correct"
+          fail: "order of elements is not correct"
 
     str:
 
@@ -89,10 +89,10 @@ templates:
           fail: "keys are not correct"
 
         - test: "sorted(list({{snippet}}.values()))"
-          fail: "values are not correct"
+          fail: "correct keys, but values are not correct"
 
         - test: "{{snippet}}"
-          fail: "not correct"
+          fail: "correct keys and values, but incorrect correspondence"
 
     bool:
         - test: "type({{snippet}})"
