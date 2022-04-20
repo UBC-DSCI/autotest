@@ -18,7 +18,7 @@ templates:
           fail: "type is not int"
 
         - test: "{{snippet}}"
-          fail: "value is not correct."
+          fail: "value is not correct"
 
     float:
         - test: "type({{snippet}})"
@@ -44,7 +44,7 @@ templates:
         - test: "len({{snippet}})"
           fail: "length is not correct"
 
-        - test: "sorted({{snippet}})"
+        - test: "sorted([str(element) for element in {{snippet}}])"
           fail: "values are not correct"
 
         - test: "{{snippet}}"
@@ -57,7 +57,7 @@ templates:
         - test: "len({{snippet}})"
           fail: "length is not correct"
 
-        - test: "sorted({{snippet}})"
+        - test: "sorted([str(element) for element in {{snippet}}])"
           fail: "values are not correct"
 
         - test: "{{snippet}}"
