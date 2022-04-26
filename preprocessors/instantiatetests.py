@@ -11,9 +11,10 @@ import asyncio
 import inspect
 
 try:
-    from time import monotonic # Py 3
+    from time import monotonic  # Py 3
 except ImportError:
-    from time import time as monotonic # Py 2
+    from time import time as monotonic  # Py 2
+
 
 class CellExecutionComplete(Exception):
     """
@@ -32,6 +33,7 @@ class CellExecutionError(Exception):
     using nbconvert as a library, since it allows to deal with
     failures gracefully.
     """
+
     def __init__(self, traceback):
         super(CellExecutionError, self).__init__(traceback)
         self.traceback = traceback
@@ -52,7 +54,8 @@ class CellExecutionError(Exception):
         """
         tb = '\n'.join(msg.get('traceback', []))
         return cls(exec_err_msg.format(code=code, traceback=tb
-                                      ))
+                                       ))
+
 
 exec_err_msg = u"""\
 An error occurred while executing the following code:
@@ -62,8 +65,8 @@ An error occurred while executing the following code:
 {traceback}
 """
 
-class InstantiateTests(Execute):
 
+class InstantiateTests(Execute):
     tests = None
 
     autotest_filename = Unicode(
@@ -105,15 +108,15 @@ class InstantiateTests(Execute):
     ).tag(config=True)
 
     comment_strs = {
-        'ir' : '#',
-		'python' : '#',
-        'python3' : '#'
+        'ir': '#',
+        'python': '#',
+        'python3': '#'
     }
 
     sanitizers = {
-        'ir' : lambda s : re.sub(r'\[\d+\]\s+', '', s).strip('"').strip("'"),
-        'python' : lambda s : s.strip('"').strip("'"),
-        'python3' : lambda s : s.strip('"').strip("'")
+        'ir': lambda s: re.sub(r'\[\d+\]\s+', '', s).strip('"').strip("'"),
+        'python': lambda s: s.strip('"').strip("'"),
+        'python3': lambda s: s.strip('"').strip("'")
     }
 
     def preprocess(self, nb, resources):
@@ -127,52 +130,51 @@ class InstantiateTests(Execute):
         return nb, resources
 
     def preprocess_cell(self, cell, resources, index):
-        #new_lines will store the replacement code after autotest template instantiation
+        # new_lines will store the replacement code after autotest template instantiation
         new_lines = []
- 
-        #first, run the cell normally
+
+        # first, run the cell normally
         cell, resources = super(InstantiateTests, self).preprocess_cell(cell, resources, index)
 
-        #if it's not a code cell or it's empty, just return
+        # if it's not a code cell or it's empty, just return
         if cell.cell_type != 'code':
             return cell, resources
 
         # determine whether the cell is a grade cell
         is_grade = utils.is_grade(cell)
 
-        #get the comment string for this language
+        # get the comment string for this language
         comment_str = self.comment_strs[resources['kernel_name']]
 
-        #split the code lines into separate strings
+        # split the code lines into separate strings
         lines = cell.source.split("\n")
 
-        
         tests_loaded = False
 
         for line in lines:
 
-            #if the current line doesn't have the autotest_delimiter or is not a comment 
-            #then just append the line to the new cell code and go to the next line
+            # if the current line doesn't have the autotest_delimiter or is not a comment
+            # then just append the line to the new cell code and go to the next line
             if self.autotest_delimiter not in line or line.strip()[:len(comment_str)] != comment_str:
                 new_lines.append(line)
                 continue
 
             # there are autotests; we should check that it is a grading cell
-            if not is_grade and self.enforce_metadata: 
+            if not is_grade and self.enforce_metadata:
                 raise RuntimeError(
-                   "Autotest region detected in a non-grade cell; "
-                   "please make sure all autotest regions are within "
-                   "'Autograder tests' cells."
+                    "Autotest region detected in a non-grade cell; "
+                    "please make sure all autotest regions are within "
+                    "'Autograder tests' cells."
                 )
-            
+
             self.log.debug('')
             self.log.debug('')
             self.log.debug('Autotest delimiter found on line. Preprocessing...')
 
-            #the first time we run into an autotest delimiter, obtain the 
-            #tests object from the tests.yml template file for the assignment
-            #and append any setup code to the cell block we're in
-            #also figure out what language we're using
+            # the first time we run into an autotest delimiter, obtain the
+            # tests object from the tests.yml template file for the assignment
+            # and append any setup code to the cell block we're in
+            # also figure out what language we're using
             if not tests_loaded:
                 self.log.debug('Loading tests template file')
                 self._load_test_template_file(resources)
@@ -180,48 +182,55 @@ class InstantiateTests(Execute):
                     new_lines.append(self.setup_code)
                     asyncio.run(self._async_execute_code_snippet(self.setup_code))
                 self.log.debug('Setting sanitizer for language ' + resources['kernel_name'])
-                self.sanitizer = self.sanitizers.get(resources['kernel_name'], lambda x : x)
+                self.sanitizer = self.sanitizers.get(resources['kernel_name'], lambda x: x)
                 tests_loaded = True
 
-            #decide whether to use hashing based on whether the self.hashed_delimiter token appears in the line before the self.autotest_delimiter token
+            # decide whether to use hashing based on whether the self.hashed_delimiter token appears in the line before the self.autotest_delimiter token
             use_hash = (self.hashed_delimiter in line[:line.find(self.autotest_delimiter)])
             if use_hash:
                 self.log.debug('Hashing delimiter found, using template: ' + self.hash_template)
             else:
                 self.log.debug('Hashing delimiter not found')
-            
-            #take everything after the autotest_delimiter as code snippets separated by semicolons
-            snippets = [snip.strip() for snip in line[line.find(self.autotest_delimiter)+len(self.autotest_delimiter):].strip(';').split(';')]
 
-            #print autotest snippets to log
+            # take everything after the autotest_delimiter as code snippets separated by semicolons
+            snippets = [snip.strip() for snip in
+                        line[line.find(self.autotest_delimiter) + len(self.autotest_delimiter):].strip(';').split(';')]
+
+            # remove empty snippets
+            if '' in snippets:
+                snippets.remove('')
+
+            # print autotest snippets to log
             self.log.debug('Found snippets to autotest: ')
             for snippet in snippets:
                 self.log.debug(snippet)
 
-            #generate the test for each snippet
+            # generate the test for each snippet
             for snippet in snippets:
                 self.log.debug('Running autotest generation for snippet ' + snippet)
 
-                #create a random salt for this test
+                # create a random salt for this test
                 if use_hash:
                     salt = secrets.token_hex(8)
                     self.log.debug('Using salt: ' + salt)
                 else:
                     salt = None
 
-                #get the normalized(/hashed) template tests for this code snippet
-                self.log.debug('Instantiating normalized'+('/hashed ' if use_hash else ' ')+ 'test templates based on type')
+                # get the normalized(/hashed) template tests for this code snippet
+                self.log.debug(
+                    'Instantiating normalized' + ('/hashed ' if use_hash else ' ') + 'test templates based on type')
                 instantiated_tests, test_values, fail_messages = self._instantiate_tests(snippet, salt)
 
                 # add all the lines to the cell
                 self.log.debug('Inserting test code into cell')
                 template = j2.Environment(loader=j2.BaseLoader).from_string(self.check_template)
                 for i in range(len(instantiated_tests)):
-                    check_code = template.render(snippet=instantiated_tests[i], value=test_values[i], message=fail_messages[i])
+                    check_code = template.render(snippet=instantiated_tests[i], value=test_values[i],
+                                                 message=fail_messages[i])
                     self.log.debug('Test: ' + check_code)
                     new_lines.append(check_code)
-                
-                #add an empty line after this block of test code
+
+                # add an empty line after this block of test code
                 new_lines.append('')
 
         # replace the cell source
@@ -229,7 +238,7 @@ class InstantiateTests(Execute):
 
         # add the final success message
         if tests_loaded:
-            cell.source += '\n'+self.success_code
+            cell.source += '\n' + self.success_code
 
         return cell, resources
 
@@ -262,35 +271,35 @@ class InstantiateTests(Execute):
             self.log.error(e.msg)
             raise
 
-        #get the test templates
+        # get the test templates
         self.test_templates_by_type = tests['templates']
 
-        #get the test dispatch code template
+        # get the test dispatch code template
         self.dispatch_template = tests['dispatch']
 
-        #get the sucess message template
+        # get the sucess message template
         self.success_code = tests['success']
 
-        #get the hash code template
+        # get the hash code template
         self.hash_template = tests['hash']
 
-        #get the hash code template
+        # get the hash code template
         self.check_template = tests['check']
 
-        #get the hash code template
+        # get the hash code template
         self.normalize_template = tests['normalize']
 
-        #get the setup code if it's there
+        # get the setup code if it's there
         self.setup_code = tests.get('setup', None)
 
-    def _instantiate_tests(self, snippet, salt = None):
-        #get the type of the snippet output (used to dispatch autotest)
+    def _instantiate_tests(self, snippet, salt=None):
+        # get the type of the snippet output (used to dispatch autotest)
         template = j2.Environment(loader=j2.BaseLoader).from_string(self.dispatch_template)
         dispatch_code = template.render(snippet=snippet)
         dispatch_result = asyncio.run(self._async_execute_code_snippet(dispatch_code))
         self.log.debug('Dispatch result returned by kernel: ' + dispatch_result)
-        #get the test code; if the type isn't in our dict, just default to 'default'
-        #if default isn't in the tests code, this will throw an error
+        # get the test code; if the type isn't in our dict, just default to 'default'
+        # if default isn't in the tests code, this will throw an error
         try:
             tests = self.test_templates_by_type.get(dispatch_result, self.test_templates_by_type['default'])
         except KeyError:
@@ -301,16 +310,17 @@ class InstantiateTests(Execute):
             fail_msgs = [t['fail'] for t in tests]
         except KeyError:
             self.log.error('each type in tests.yml must have a list of dictionaries with a "test" and "fail" key')
-            self.log.error('the "test" item should store the test template code, and the "fail" item should store a failure message')
+            self.log.error(
+                'the "test" item should store the test template code, and the "fail" item should store a failure message')
             raise
 
-        #normalize the templates
+        # normalize the templates
         normalized_templs = []
         for templ in test_templs:
             template = j2.Environment(loader=j2.BaseLoader).from_string(self.normalize_template)
             normalized_templs.append(template.render(snippet=templ))
 
-        #hashify the templates
+        # hashify the templates
         processed_templs = []
         if salt is not None:
             for templ in normalized_templs:
@@ -319,14 +329,14 @@ class InstantiateTests(Execute):
         else:
             processed_templs = normalized_templs
 
-        #instantiate and evaluate the tests
+        # instantiate and evaluate the tests
         instantiated_tests = []
         test_values = []
         for templ in processed_templs:
-            #instantiate the template snippet
+            # instantiate the template snippet
             template = j2.Environment(loader=j2.BaseLoader).from_string(templ)
             instantiated_test = template.render(snippet=snippet)
-            #run the instantiated template code
+            # run the instantiated template code
             test_value = asyncio.run(self._async_execute_code_snippet(instantiated_test))
             instantiated_tests.append(instantiated_test)
             test_values.append(test_value)
@@ -339,12 +349,12 @@ class InstantiateTests(Execute):
     # https://github.com/jupyter/nbclient/commit/0c08e27c1ec655cffe9b35cf637da742cdab36e8
     #########################
 
-    #adapted from nbclient.util.ensure_async
+    # adapted from nbclient.util.ensure_async
     async def _ensure_async(self, obj):
         """Convert a non-awaitable object to a coroutine if needed,
         and await it if it was not already awaited.
         adapted from nbclient.util._ensure_async
-        """        
+        """
         if inspect.isawaitable(obj):
             try:
                 result = await obj
@@ -355,7 +365,7 @@ class InstantiateTests(Execute):
             return result
         return obj
 
-    #adapted from nbclient.client._async_handle_timeout
+    # adapted from nbclient.client._async_handle_timeout
     async def _async_handle_timeout(self):
         self.log.error(
             "Timeout waiting for execute reply (%is)." % self.timeout)
@@ -364,18 +374,18 @@ class InstantiateTests(Execute):
             await self._ensure_async(self.km.interrupt_kernel())
         else:
             raise TimeoutError("Cell execution timed out")
-    
-    #adapted from nbclient.client._async_check_alive
+
+    # adapted from nbclient.client._async_check_alive
     async def _async_check_alive(self):
-         if not await self._ensure_async(self.kc.is_alive()):
+        if not await self._ensure_async(self.kc.is_alive()):
             self.log.error(
                 "Kernel died while waiting for execute reply.")
             raise DeadKernelError("Kernel died")
 
-    #adapted from nbclient.client._async_poll_output_msg
+    # adapted from nbclient.client._async_poll_output_msg
     async def _async_poll_output_msg(self, parent_msg_id, code):
         assert self.kc is not None
-        
+
         self.log.debug("Executing _async_poll_output_msg:\n%s", parent_msg_id)
         while True:
             msg = await self._ensure_async(self.kc.iopub_channel.get_msg(timeout=None))
@@ -396,14 +406,14 @@ class InstantiateTests(Execute):
 
                     if msg_type == 'status':
                         if content['execution_state'] == 'idle':
-                            raise CellExecutionComplete()                   
+                            raise CellExecutionComplete()
                 except CellExecutionComplete:
                     self.log.debug("Get _async_poll_output_msg:\n%s", msg)
                     break
-        
+
         return None
 
-    #adapted from nbclient.client.async_wait_for_reply
+    # adapted from nbclient.client.async_wait_for_reply
     async def _async_wait_for_reply(self, msg_id, cell=None, timeout=None):
         # wait for finish, with timeout
         cummulative_time = 0
@@ -419,21 +429,22 @@ class InstantiateTests(Execute):
                     break
             else:
                 if msg['parent_header'].get('msg_id') == msg_id:
-                    return msg            
+                    return msg
 
-    #adapted from nbclient.client._async_poll_for_reply
+                    # adapted from nbclient.client._async_poll_for_reply
+
     async def _async_poll_for_reply(self, msg_id, timeout, task_poll_output_msg, task_poll_kernel_alive):
         assert self.kc is not None
-        
+
         self.log.debug("Executing _async_poll_for_reply:\n%s", msg_id)
 
         if timeout is not None:
             deadline = monotonic() + timeout
             new_timeout = float(timeout)
-        
+
         while True:
             try:
-                shell_msg = await self._ensure_async(self.kc.shell_channel.get_msg(timeout = new_timeout))
+                shell_msg = await self._ensure_async(self.kc.shell_channel.get_msg(timeout=new_timeout))
                 if shell_msg['parent_header'].get('msg_id') == msg_id:
                     try:
                         msg = await asyncio.wait_for(task_poll_output_msg, new_timeout)
@@ -442,7 +453,7 @@ class InstantiateTests(Execute):
                         raise CellExecutionError("Timeout waiting for IOPub output")
                     self.log.debug("Get _async_poll_for_reply:\n%s", msg)
 
-                    return msg if msg !=None else ""
+                    return msg if msg != None else ""
                 else:
                     if new_timeout is not None:
                         new_timeout = max(0, deadline - monotonic())
@@ -451,8 +462,8 @@ class InstantiateTests(Execute):
                 task_poll_kernel_alive.cancel()
                 await self._async_check_alive()
                 await self._async_handle_timeout()
-    
-    #adapted from nbclient.client.async_execute_cell
+
+    # adapted from nbclient.client.async_execute_cell
     async def _async_execute_code_snippet(self, code):
         assert self.kc is not None
 
@@ -464,7 +475,8 @@ class InstantiateTests(Execute):
 
         task_poll_output_msg = asyncio.ensure_future(self._async_poll_output_msg(parent_msg_id, code))
 
-        task_poll_for_reply = asyncio.ensure_future(self._async_poll_for_reply(parent_msg_id, self.timeout, task_poll_output_msg, task_poll_kernel_alive))
+        task_poll_for_reply = asyncio.ensure_future(
+            self._async_poll_for_reply(parent_msg_id, self.timeout, task_poll_output_msg, task_poll_kernel_alive))
 
         try:
             msg = await task_poll_for_reply
