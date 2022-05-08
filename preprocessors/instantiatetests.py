@@ -126,6 +126,9 @@ class InstantiateTests(Execute):
         'python3': lambda s: s.strip('"').strip("'")
     }
 
+    sanitizer = None
+    global_tests_loaded = False
+
     # -------------------------------------------------------------------------------------
     def preprocess(self, nb, resources):
         kernel_name = nb.metadata.get("kernelspec", {}).get("name", "")
@@ -158,7 +161,7 @@ class InstantiateTests(Execute):
         # split the code lines into separate strings
         lines = cell.source.split("\n")
 
-        tests_loaded = False
+        setup_code_inserted_into_cell = False
 
         for line in lines:
 
@@ -185,15 +188,23 @@ class InstantiateTests(Execute):
             # tests object from the tests.yml template file for the assignment
             # and append any setup code to the cell block we're in
             # also figure out what language we're using
-            if not tests_loaded:
+
+            # loading the template tests file
+            if not self.global_tests_loaded:
                 self.log.debug('Loading tests template file')
                 self._load_test_template_file(resources)
-                if self.setup_code is not None:
-                    new_lines.append(self.setup_code)
-                    asyncio.run(self._async_execute_code_snippet(self.setup_code))
+                self.global_tests_loaded = True
+
+            # if the setup_code is successfully obtained from the template file and
+            # the current cell does not already have the setup code, add the setup_code
+            if (self.setup_code is not None) and (not setup_code_inserted_into_cell):
+                new_lines.append(self.setup_code)
+                setup_code_inserted_into_cell = True
+                asyncio.run(self._async_execute_code_snippet(self.setup_code))
+
+            if self.sanitizer is None:
                 self.log.debug('Setting sanitizer for language ' + resources['kernel_name'])
                 self.sanitizer = self.sanitizers.get(resources['kernel_name'], lambda x: x)
-                tests_loaded = True
 
             # decide whether to use hashing based on whether the self.hashed_delimiter token 
             # appears in the line before the self.autotest_delimiter token
@@ -248,7 +259,7 @@ class InstantiateTests(Execute):
         cell.source = "\n".join(new_lines)
 
         # add the final success message
-        if tests_loaded:
+        if is_grade_flag and self.global_tests_loaded:
             cell.source += '\n' + self.success_code
 
         return cell, resources
