@@ -16,6 +16,7 @@ except ImportError:
     from time import time as monotonic  # Py 2
 
 
+#########################################################################################
 class CellExecutionComplete(Exception):
     """
     Used as a control signal for cell execution across run_cell and
@@ -26,35 +27,40 @@ class CellExecutionComplete(Exception):
     pass
 
 
+#########################################################################################
 class CellExecutionError(Exception):
     """
     Custom exception to propagate exceptions that are raised during
     notebook execution to the caller. This is mostly useful when
-    using nbconvert as a library, since it allows to deal with
+    using nbconvert as a library, since it allows dealing with
     failures gracefully.
     """
 
+    # -------------------------------------------------------------------------------------
     def __init__(self, traceback):
         super(CellExecutionError, self).__init__(traceback)
         self.traceback = traceback
 
+    # -------------------------------------------------------------------------------------
     def __str__(self):
         s = self.__unicode__()
         if not isinstance(s, str):
             s = s.encode('utf8', 'replace')
         return s
 
+    # -------------------------------------------------------------------------------------
     def __unicode__(self):
         return self.traceback
 
+    # -------------------------------------------------------------------------------------
     @classmethod
     def from_code_and_msg(cls, code, msg):
         """Instantiate from a code cell object and a message contents
         (message is either execute_reply or error)
         """
         tb = '\n'.join(msg.get('traceback', []))
-        return cls(exec_err_msg.format(code=code, traceback=tb
-                                       ))
+        return cls(exec_err_msg.format(code=code, traceback=tb))
+    # -------------------------------------------------------------------------------------
 
 
 exec_err_msg = u"""\
@@ -66,6 +72,7 @@ An error occurred while executing the following code:
 """
 
 
+#########################################################################################
 class InstantiateTests(Execute):
     tests = None
 
@@ -119,6 +126,7 @@ class InstantiateTests(Execute):
         'python3': lambda s: s.strip('"').strip("'")
     }
 
+    # -------------------------------------------------------------------------------------
     def preprocess(self, nb, resources):
         kernel_name = nb.metadata.get("kernelspec", {}).get("name", "")
         if kernel_name not in self.comment_strs:
@@ -129,6 +137,7 @@ class InstantiateTests(Execute):
         nb, resources = super(InstantiateTests, self).preprocess(nb, resources)
         return nb, resources
 
+    # -------------------------------------------------------------------------------------
     def preprocess_cell(self, cell, resources, index):
         # new_lines will store the replacement code after autotest template instantiation
         new_lines = []
@@ -136,12 +145,12 @@ class InstantiateTests(Execute):
         # first, run the cell normally
         cell, resources = super(InstantiateTests, self).preprocess_cell(cell, resources, index)
 
-        # if it's not a code cell or it's empty, just return
+        # if it's not a code cell, or it's empty, just return
         if cell.cell_type != 'code':
             return cell, resources
 
         # determine whether the cell is a grade cell
-        is_grade = utils.is_grade(cell)
+        is_grade_flag = utils.is_grade(cell)
 
         # get the comment string for this language
         comment_str = self.comment_strs[resources['kernel_name']]
@@ -160,12 +169,13 @@ class InstantiateTests(Execute):
                 continue
 
             # there are autotests; we should check that it is a grading cell
-            if not is_grade and self.enforce_metadata:
-                raise RuntimeError(
+            if not is_grade_flag and self.enforce_metadata:
+                self.log.error(
                     "Autotest region detected in a non-grade cell; "
                     "please make sure all autotest regions are within "
                     "'Autograder tests' cells."
                 )
+                raise Exception
 
             self.log.debug('')
             self.log.debug('')
@@ -185,7 +195,8 @@ class InstantiateTests(Execute):
                 self.sanitizer = self.sanitizers.get(resources['kernel_name'], lambda x: x)
                 tests_loaded = True
 
-            # decide whether to use hashing based on whether the self.hashed_delimiter token appears in the line before the self.autotest_delimiter token
+            # decide whether to use hashing based on whether the self.hashed_delimiter token 
+            # appears in the line before the self.autotest_delimiter token
             use_hash = (self.hashed_delimiter in line[:line.find(self.autotest_delimiter)])
             if use_hash:
                 self.log.debug('Hashing delimiter found, using template: ' + self.hash_template)
@@ -242,7 +253,12 @@ class InstantiateTests(Execute):
 
         return cell, resources
 
+    # -------------------------------------------------------------------------------------
     def _load_test_template_file(self, resources):
+        """
+        attempts to load the tests.yml file within the assignment directory. In case such file is not found
+        or perhaps cannot be loaded, it will attempt to load the default_tests.yaml file with the course_directory
+        """
         self.log.debug('loading template tests.yml...')
         try:
             with open(os.path.join(resources['metadata']['path'], self.autotest_filename), 'r') as tests_file:
@@ -292,6 +308,7 @@ class InstantiateTests(Execute):
         # get the setup code if it's there
         self.setup_code = tests.get('setup', None)
 
+    # -------------------------------------------------------------------------------------
     def _instantiate_tests(self, snippet, salt=None):
         # get the type of the snippet output (used to dispatch autotest)
         template = j2.Environment(loader=j2.BaseLoader).from_string(self.dispatch_template)
@@ -310,8 +327,8 @@ class InstantiateTests(Execute):
             fail_msgs = [t['fail'] for t in tests]
         except KeyError:
             self.log.error('each type in tests.yml must have a list of dictionaries with a "test" and "fail" key')
-            self.log.error(
-                'the "test" item should store the test template code, and the "fail" item should store a failure message')
+            self.log.error('the "test" item should store the test template code, '
+                           'and the "fail" item should store a failure message')
             raise
 
         # normalize the templates
@@ -343,12 +360,15 @@ class InstantiateTests(Execute):
 
         return instantiated_tests, test_values, fail_msgs
 
+    # -------------------------------------------------------------------------------------
+    
     #########################
     # async version of nbgrader interaction with kernel
-    # the below functions were adapted from the jupyter/nbclient github repo, commit:
+    # the below functions were adapted from the jupyter/nbclient GitHub repo, commit:
     # https://github.com/jupyter/nbclient/commit/0c08e27c1ec655cffe9b35cf637da742cdab36e8
     #########################
 
+    # -------------------------------------------------------------------------------------
     # adapted from nbclient.util.ensure_async
     async def _ensure_async(self, obj):
         """Convert a non-awaitable object to a coroutine if needed,
@@ -365,6 +385,7 @@ class InstantiateTests(Execute):
             return result
         return obj
 
+    # -------------------------------------------------------------------------------------
     # adapted from nbclient.client._async_handle_timeout
     async def _async_handle_timeout(self):
         self.log.error(
@@ -375,6 +396,7 @@ class InstantiateTests(Execute):
         else:
             raise TimeoutError("Cell execution timed out")
 
+    # -------------------------------------------------------------------------------------
     # adapted from nbclient.client._async_check_alive
     async def _async_check_alive(self):
         if not await self._ensure_async(self.kc.is_alive()):
@@ -382,6 +404,7 @@ class InstantiateTests(Execute):
                 "Kernel died while waiting for execute reply.")
             raise DeadKernelError("Kernel died")
 
+    # -------------------------------------------------------------------------------------
     # adapted from nbclient.client._async_poll_output_msg
     async def _async_poll_output_msg(self, parent_msg_id, code):
         assert self.kc is not None
@@ -413,6 +436,7 @@ class InstantiateTests(Execute):
 
         return None
 
+    # -------------------------------------------------------------------------------------
     # adapted from nbclient.client.async_wait_for_reply
     async def _async_wait_for_reply(self, msg_id, cell=None, timeout=None):
         # wait for finish, with timeout
@@ -431,8 +455,8 @@ class InstantiateTests(Execute):
                 if msg['parent_header'].get('msg_id') == msg_id:
                     return msg
 
-                    # adapted from nbclient.client._async_poll_for_reply
-
+    # -------------------------------------------------------------------------------------
+    # adapted from nbclient.client._async_poll_for_reply
     async def _async_poll_for_reply(self, msg_id, timeout, task_poll_output_msg, task_poll_kernel_alive):
         assert self.kc is not None
 
@@ -463,6 +487,7 @@ class InstantiateTests(Execute):
                 await self._async_check_alive()
                 await self._async_handle_timeout()
 
+    # -------------------------------------------------------------------------------------
     # adapted from nbclient.client.async_execute_cell
     async def _async_execute_code_snippet(self, code):
         assert self.kc is not None
@@ -494,3 +519,4 @@ class InstantiateTests(Execute):
                 raise
 
         return msg
+    # -------------------------------------------------------------------------------------
