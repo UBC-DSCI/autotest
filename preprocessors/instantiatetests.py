@@ -169,6 +169,9 @@ class InstantiateTests(Execute):
             # then just append the line to the new cell code and go to the next line
             if self.autotest_delimiter not in line or line.strip()[:len(comment_str)] != comment_str:
                 new_lines.append(line)
+                # run other lines in cell containing the autotest_delimiter
+                if self.autotest_delimiter in cell.source:
+                    asyncio.run(self._async_execute_code_snippet(line))
                 continue
 
             # there are autotests; we should check that it is a grading cell
@@ -304,7 +307,7 @@ class InstantiateTests(Execute):
         # get the test dispatch code template
         self.dispatch_template = tests['dispatch']
 
-        # get the sucess message template
+        # get the success message template
         self.success_code = tests['success']
 
         # get the hash code template
