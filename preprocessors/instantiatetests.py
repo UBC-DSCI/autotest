@@ -163,16 +163,20 @@ class InstantiateTests(Execute):
 
         setup_code_inserted_into_cell = False
 
+        non_autotest_code_lines = []
+
         for line in lines:
 
             # if the current line doesn't have the autotest_delimiter or is not a comment
             # then just append the line to the new cell code and go to the next line
             if self.autotest_delimiter not in line or line.strip()[:len(comment_str)] != comment_str:
                 new_lines.append(line)
-                # run other lines in cell containing the autotest_delimiter
-                if self.autotest_delimiter in cell.source:
-                    asyncio.run(self._async_execute_code_snippet(line))
+                non_autotest_code_lines.append(line)
                 continue
+
+            # run all code lines prior to the current line containing the autotest_delimiter
+            asyncio.run(self._async_execute_code_snippet("\n".join(non_autotest_code_lines)))
+            non_autotest_code_lines = []
 
             # there are autotests; we should check that it is a grading cell
             if not is_grade_flag and self.enforce_metadata:
@@ -263,7 +267,8 @@ class InstantiateTests(Execute):
 
         # add the final success message
         if is_grade_flag and self.global_tests_loaded:
-            cell.source += '\n' + self.success_code
+            if self.autotest_delimiter in cell.source:
+                cell.source += '\n' + self.success_code
 
         return cell, resources
 
