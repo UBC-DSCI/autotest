@@ -1,0 +1,20 @@
+name: mainsite
+channels:
+  - eoas_ubc
+  - conda-forge
+  - defaults
+dependencies:
+  - altair
+  - altair_data_server
+  - click
+  - conda-lock
+  - git
+  - mamba
+  - numpy
+  - pandas
+  - pip
+  - python=3.9
+  - scikit-learn
+  - sqlalchemy<2.0
+  - yellowbrick
+# conda-lock --kind explicit --file environment.yml -p linux-64

@@ -1,0 +1,9 @@
+#!/bin/bash
+echo "${NB_PYTHON_PREFIX}/bin"
+echo "current directory ${CWD}"
+jupyter nbextension install --sys-prefix --py nbgrader --overwrite
+jupyter nbextension enable --sys-prefix --py nbgrader
+jupyter serverextension enable --sys-prefix --py nbgrader
+cd ${HOME}/autotest_files
+./install_autotest.sh
+echo "ran install_autotest.sh in postbuild"
