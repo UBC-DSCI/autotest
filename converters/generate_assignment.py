@@ -9,6 +9,7 @@ from .base import BaseConverter, NbGraderException
 from ..preprocessors import (
     IncludeHeaderFooter,
     InstantiateTests,
+    LimitTestCellHeights,
     Execute,
     ClearSolutions,
     LockCells,
@@ -57,6 +58,7 @@ class GenerateAssignment(BaseConverter):
     preprocessors = List([
         IncludeHeaderFooter,
         InstantiateTests,
+        LimitTestCellHeights,
         Execute,
         LockCells,
         ClearSolutions,
