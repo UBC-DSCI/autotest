@@ -82,7 +82,7 @@ class InstantiateTests(Execute):
     ).tag(config=True)
 
     default_autotest_filename = Unicode(
-        "default_tests.yml",
+        "tests.yml",
         help="The filename where the default automatic testing code is stored"
     ).tag(config=True)
 
