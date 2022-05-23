@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+
+  demo_image:
+    image: autotest:v0.1
+    build:
+      context: demo_context
+    container_name: autotest_demo
+    labels:
+      - "traefik.enable=false"
+    volumes:
+      - ./source:/home/jovyan/course/source
+      - ./release:/home/jovyan/course/release
+    ports:
+      - "8888:8888"
+    command: ["jupyter", "notebook","--NotebookApp.token=''","--debug"]
