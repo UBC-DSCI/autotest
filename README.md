@@ -35,6 +35,8 @@ To see how Autotest processes your questions, you can instead run with debug fla
 ```
 nbgrader generate_assignment --force --debug ps3
 ```
+The release version of the assignment will appear with generated test code in the `release/` folder.
+
 See the `source/` folder for other demo assignments. You can also add your own in the `demo/source/` folder 
 of this repository. Make sure to give `a+rwx` permissions to each assignment you add to the folder, 
 as otherwise the jupyter user won't be able to read/write to them.
