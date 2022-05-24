@@ -24,7 +24,7 @@ and start a Jupyter notebook server. Open your browser and navigate to `localhos
 this should open the Jupyter notebook interface.
 
 We have included a few example autograded notebooks in this demo container.
-For example, to test Autotest, you can process the `ps3` assignment.
+For example, you can use Autotest to process the `ps3` assignment.
 Open a terminal in the Jupyter notebook home folder and run
 ```
 nbgrader generate_assignment --force ps3
