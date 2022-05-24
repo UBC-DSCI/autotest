@@ -26,11 +26,12 @@ chmod a+rwx demo/release
 
 We have included a few example autograded notebooks in this demo container.
 For example, you can use Autotest to process the `ps3` assignment.
-Open a terminal in the Jupyter notebook home folder and run
+In the Jupyter notebook interface in your browser, open a terminal (`New -> Terminal`)
+and type:
 ```
 nbgrader generate_assignment --force ps3
 ```
-To see how Autotest processes your questions, run with debug flags:
+To see how Autotest processes your questions, you can instead run with debug flags:
 ```
 nbgrader generate_assignment --force --debug ps3
 ```
