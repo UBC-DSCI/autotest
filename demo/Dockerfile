@@ -65,8 +65,8 @@ RUN echo "Installing basic apt-get packages..." \
     && rm -rf /var/lib/apt/lists/*
 
 RUN echo "Copying bashrc_conda.txt and condarc.yml into the image" 
-COPY --chown=${NB_USER}:${NB_USER} bashrc_conda.txt /tmp
-COPY --chown=${NB_USER}:${NB_USER} condarc.yml /srv
+COPY --chown=${NB_USER}:${NB_USER} ./demo/bashrc_conda.txt /tmp
+COPY --chown=${NB_USER}:${NB_USER} ./demo/condarc.yml /srv
 
 RUN echo "Adding conda environment to /etc/profile.d and /home/jovyan/.bashrc" \
     && cat /tmp/bashrc_conda.txt >> /etc/profile.d/init_conda.sh \
@@ -77,11 +77,17 @@ RUN echo "conda activate ${CONDA_ENV}" >> ${HOME}/.bashrc
 
 RUN echo "Moving jupyter notebook config to /etc/jupyter" \
 RUN mkdir -p /etc/jupyter
-COPY jupyter_notebook_config.py /etc/jupyter/
+COPY ./demo/jupyter_notebook_config.py /etc/jupyter/
 
 RUN echo "Moving nbgrader_config.py and tests.yml into home"
-COPY --chown=${NB_USER}:${NB_USER} nbgrader_config.py ${HOME}/
-COPY --chown=${NB_USER}:${NB_USER} tests.yml ${HOME}/
+COPY --chown=${NB_USER}:${NB_USER} ./demo/nbgrader_config.py ${HOME}/
+COPY --chown=${NB_USER}:${NB_USER} ./demo/tests.yml ${HOME}/
+
+RUN echo "Moving autotest files into home..." 
+RUN mkdir -p ${HOME}/autotest
+COPY . ${HOME}/autotest/
+RUN chown -R ${NB_USER}:${NB_USER} ${HOME} \
+    && chmod u+x ${HOME}/autotest/install_autotest.sh
 
 # Switch to jovyan user
 USER ${NB_USER}
@@ -100,7 +106,7 @@ RUN echo "Installing Miniforge..." \
 
 # Create "notebook" conda environment
 RUN echo "Copying conda-linux-64.lock into homedir..."
-COPY conda-linux-64.lock ${HOME}
+COPY ./demo/conda-linux-64.lock ${HOME}
 RUN echo "Creating environment from conda-linux-64.lock..." \
     && mamba create --name ${CONDA_ENV} --file conda-linux-64.lock \
     && mamba clean -yaf \
@@ -110,7 +116,7 @@ RUN echo "Creating environment from conda-linux-64.lock..." \
 
 # Install pip packages
 # remove cache https://github.com/pypa/pip/pull/6391 ?
-COPY requirements.txt ${HOME}
+COPY ./demo/requirements.txt ${HOME}
 RUN echo "Installing python packages using pip from requirements.txt..." \
     && ${NB_PYTHON_PREFIX}/bin/pip install --no-cache-dir -r requirements.txt
 
@@ -120,23 +126,15 @@ RUN echo "Installing/enabling nbgrader extensions..." \
     && jupyter serverextension enable --sys-prefix --py nbgrader \
     && rm requirements.txt
 
-## finally expose port 8888 for jupyter notebook
+RUN echo "Installing autotest..." 
+WORKDIR ${HOME}/autotest
+RUN ./install_autotest.sh
+WORKDIR ${HOME}
+RUN rm -rf autotest
+
+## document exposed port 8888 for jupyter notebook
 EXPOSE 8888
 
-#RUN echo "Installing autotest..." \
-#    && 
-#
-#cd ${HOME}/autotest_files
-#./install_autotest.sh
-#echo "ran install_autotest.sh in postbuild"
-#
-#RUN echo "move nbgrader files" \
-#  && mv ${HOME}/nbgrader_files/* /home/jovyan/work/ 
-#
-#CMD ["jupyter", "notebook"]
-#
-#
-#
 
 
 

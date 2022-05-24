@@ -5,13 +5,14 @@ services:
   demo_image:
     image: autotest:v0.1
     build:
-      context: demo_context
+      context: .
+      dockerfile: ./demo/Dockerfile
     container_name: autotest_demo
     labels:
       - "traefik.enable=false"
     volumes:
-      - ./source:/home/jovyan/source
-      - ./release:/home/jovyan/release
+      - ./demo/source:/home/jovyan/source
+      - ./demo/release:/home/jovyan/release
     ports:
       - "8888:8888"
     command: ["jupyter", "notebook","--NotebookApp.token=''","--debug"]
