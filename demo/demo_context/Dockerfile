@@ -1,5 +1,6 @@
 #######################
 #######################
+#
 # Adapted from https://github.com/pangeo-data/pangeo-docker-images
 # Under the MIT License:
 # 
@@ -51,8 +52,8 @@ RUN echo "Creating ${NB_USER} user and home folder structure..." \
     && groupadd --gid ${NB_GID} ${NB_USER}  \
     && useradd --create-home --gid ${NB_GID} --no-log-init --uid ${NB_UID} ${NB_USER} \
     && chown -R ${NB_USER}:${NB_USER} /srv \
-    && mkdir -p ${HOME}/course/source \
-    && mkdir -p ${HOME}/course/release \
+    && mkdir -p ${HOME}/source \
+    && mkdir -p ${HOME}/release \
     && chown -R ${NB_USER}:${NB_USER} ${HOME}
 
 RUN echo "Installing basic apt-get packages..." \
@@ -76,11 +77,11 @@ RUN echo "conda activate ${CONDA_ENV}" >> ${HOME}/.bashrc
 
 RUN echo "Moving jupyter notebook config to /etc/jupyter" \
 RUN mkdir -p /etc/jupyter
-COPY jupyter_notebook_config.py /etc/jupyter
+COPY jupyter_notebook_config.py /etc/jupyter/
 
-RUN echo "Moving nbgrader_config.py and tests.yml into home/course"
-COPY --chown=${NB_USER}:${NB_USER} nbgrader_config.py ${HOME}/course
-COPY --chown=${NB_USER}:${NB_USER} tests.yml ${HOME}/course
+RUN echo "Moving nbgrader_config.py and tests.yml into home"
+COPY --chown=${NB_USER}:${NB_USER} nbgrader_config.py ${HOME}/
+COPY --chown=${NB_USER}:${NB_USER} tests.yml ${HOME}/
 
 # Switch to jovyan user
 USER ${NB_USER}

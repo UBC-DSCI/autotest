@@ -10,8 +10,8 @@ services:
     labels:
       - "traefik.enable=false"
     volumes:
-      - ./source:/home/jovyan/course/source
-      - ./release:/home/jovyan/course/release
+      - ./source:/home/jovyan/source
+      - ./release:/home/jovyan/release
     ports:
       - "8888:8888"
     command: ["jupyter", "notebook","--NotebookApp.token=''","--debug"]
