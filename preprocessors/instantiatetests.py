@@ -81,11 +81,6 @@ class InstantiateTests(Execute):
         help="The filename where automatic testing code is stored"
     ).tag(config=True)
 
-    default_autotest_filename = Unicode(
-        "default_tests.yml",
-        help="The filename where the default automatic testing code is stored"
-    ).tag(config=True)
-
     autotest_delimiter = Unicode(
         "AUTOTEST",
         help="The delimiter prior to snippets to be autotested"
@@ -289,15 +284,15 @@ class InstantiateTests(Execute):
             self.log.warning('No tests.yml file found. Trying to load the default tests')
             # tests = {}
             try:
-                with open(os.path.join(self.default_autotest_filename), 'r') as tests_file:
+                with open(os.path.join(self.autotest_filename), 'r') as tests_file:
                     tests = yaml.safe_load(tests_file)
             except FileNotFoundError:
                 # if there is no tests file, just create a default empty tests dict
                 self.log.warning(
-                    'No default_tests.yml file found. If AUTOTESTS appears in testing cells, an error will be thrown.')
+                    'No default tests.yml file found. If AUTOTESTS appears in testing cells, an error will be thrown.')
                 tests = {}
             except yaml.parser.ParserError as e:
-                self.log.error('default_tests.yml contains invalid YAML code.')
+                self.log.error('tests.yml contains invalid YAML code.')
                 self.log.error(e.msg)
                 raise
 

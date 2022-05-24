@@ -1,3 +1,5 @@
+![alt text](docs/autotest.png)
+
 # Based version
 Autotest supports nbgrader version [0.6.2](https://pypi.org/project/nbgrader/)
 # Setup
@@ -8,7 +10,7 @@ Autotest supports nbgrader version [0.6.2](https://pypi.org/project/nbgrader/)
 3. Clone this repository to local
 4. Install the requirements:
   ```bash
-  pip install -r reqs.txt 
+  pip install -r requirements.txt 
   ```
 5. Execute `./install_autotest.sh` under the root of this repository, it will automatically install `autotest generation` module over the nbgrader package
 6. Install extensions
