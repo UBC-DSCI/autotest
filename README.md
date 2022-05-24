@@ -7,7 +7,7 @@ You can either set up Autotest on your own machine, or run our demo
 in a docker container.
 
 # Demo
-To run the demo, clone this repository and navigate to it.
+To run the demo, clone Autotest and navigate to the root of the repository.
 Give read/write permissions to the `demo/source` and `demo/release` folders
 (which will appear in the running docker container's home folder):
 ```
@@ -15,7 +15,7 @@ chmod a+rwx demo/source
 chmod a+rwx demo/release
 ```
 
-Next make sure Docker is installed on your machine, and run in the repository root:
+Next make sure Docker is installed on your machine, and run (also in the repo root folder):
 ```
 docker-compose up
 ```
