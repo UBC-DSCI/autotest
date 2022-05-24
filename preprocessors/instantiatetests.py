@@ -289,10 +289,10 @@ class InstantiateTests(Execute):
             except FileNotFoundError:
                 # if there is no tests file, just create a default empty tests dict
                 self.log.warning(
-                    'No default_tests.yml file found. If AUTOTESTS appears in testing cells, an error will be thrown.')
+                    'No default tests.yml file found. If AUTOTESTS appears in testing cells, an error will be thrown.')
                 tests = {}
             except yaml.parser.ParserError as e:
-                self.log.error('default_tests.yml contains invalid YAML code.')
+                self.log.error('tests.yml contains invalid YAML code.')
                 self.log.error(e.msg)
                 raise
 

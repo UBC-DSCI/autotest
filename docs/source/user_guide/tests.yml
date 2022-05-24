@@ -24,8 +24,8 @@ templates:
         - test: "type({{snippet}})"
           fail: "type is not float"
 
-        - test: "round({{snippet}}, 5)"
-          fail: "value is not correct (rounded to 5 decimal places)"
+        - test: "round({{snippet}}, 8)"
+          fail: "value is not correct (rounded to 8 decimal places)"
 
     set:
         - test: "type({{snippet}})"
