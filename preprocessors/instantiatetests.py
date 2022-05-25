@@ -262,13 +262,13 @@ class InstantiateTests(Execute):
                 # add an empty line after this block of test code
                 new_lines.append('')
 
-        # replace the cell source
-        cell.source = "\n".join(new_lines)
-
         # add the final success message
         if is_grade_flag and self.global_tests_loaded:
             if self.autotest_delimiter in cell.source:
-                cell.source += '\n' + self.success_code
+                new_lines.append(self.success_code)
+
+        # replace the cell source
+        cell.source = "\n".join(new_lines)
 
         return cell, resources
 
