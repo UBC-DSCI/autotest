@@ -170,7 +170,11 @@ class InstantiateTests(Execute):
                 continue
 
             # run all code lines prior to the current line containing the autotest_delimiter
-            asyncio.run(self._async_execute_code_snippet("\n".join(non_autotest_code_lines)))
+            try:
+                asyncio.run(self._async_execute_code_snippet("\n".join(non_autotest_code_lines)))
+            except Exception as e:
+                self.log.debug("\n".join(non_autotest_code_lines))
+                self.log.debug(e)
             non_autotest_code_lines = []
 
             # there are autotests; we should check that it is a grading cell
