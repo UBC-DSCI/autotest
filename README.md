@@ -1,10 +1,8 @@
 <img src="docs/autotest.png" width="450"/> 
 
-Autotest is an extension to [NbGrader](https://github.com/jupyter/nbgrader) that 
-automatically generates test code for autograded questions.
+## [NbGrader](https://github.com/jupyter/nbgrader) extension for automatically generating test code.
 
-You can either set up Autotest on your own machine, or run our demo 
-in a docker container.
+![autotest_demo](https://user-images.githubusercontent.com/5981307/170394669-37f7f22b-00fd-441d-9a5e-f82761835f89.gif)
 
 # Demo
 To run the demo, make sure Docker is installed on your machine, and run the following
