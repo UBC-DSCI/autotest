@@ -39,6 +39,10 @@ See the `source/` folder for other demo assignments. You can also add your own i
 of this repository. Make sure to give `a+rwx` permissions to each assignment you add to the folder, 
 as otherwise the jupyter user won't be able to read/write to them.
 
+# How It Works
+
+TODO.
+
 # Installation
 1. Create a python virtual environment:
   * Python [venv](https://docs.python.org/3/tutorial/venv.html)
