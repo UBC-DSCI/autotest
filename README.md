@@ -4,6 +4,7 @@
 
 ![autotest_demo](https://user-images.githubusercontent.com/5981307/170394669-37f7f22b-00fd-441d-9a5e-f82761835f89.gif)
 
+
 # Demo
 To run the demo, make sure Docker is installed on your machine, and run the following
 in the root folder of the repository:
@@ -41,7 +42,7 @@ as otherwise the jupyter user won't be able to read/write to them.
 
 # How It Works
 
-TODO.
+You can [watch a brief explainer video here.](https://youtu.be/chdqmuul_0M) More technical details will be added here in the README soon.
 
 # Installation
 1. Create a python virtual environment:
