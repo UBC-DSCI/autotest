@@ -160,6 +160,10 @@ class InstantiateTests(Execute):
 
         non_autotest_code_lines = []
 
+        if self.sanitizer is None:
+            self.log.debug('Setting sanitizer for language ' + resources['kernel_name'])
+            self.sanitizer = self.sanitizers.get(resources['kernel_name'], lambda x: x)
+
         for line in lines:
 
             # if the current line doesn't have the autotest_delimiter or is not a comment
@@ -170,11 +174,7 @@ class InstantiateTests(Execute):
                 continue
 
             # run all code lines prior to the current line containing the autotest_delimiter
-            try:
-                asyncio.run(self._async_execute_code_snippet("\n".join(non_autotest_code_lines)))
-            except Exception as e:
-                self.log.debug("\n".join(non_autotest_code_lines))
-                self.log.debug(e)
+            asyncio.run(self._async_execute_code_snippet("\n".join(non_autotest_code_lines)))
             non_autotest_code_lines = []
 
             # there are autotests; we should check that it is a grading cell
@@ -207,10 +207,6 @@ class InstantiateTests(Execute):
                 new_lines.append(self.setup_code)
                 setup_code_inserted_into_cell = True
                 asyncio.run(self._async_execute_code_snippet(self.setup_code))
-
-            if self.sanitizer is None:
-                self.log.debug('Setting sanitizer for language ' + resources['kernel_name'])
-                self.sanitizer = self.sanitizers.get(resources['kernel_name'], lambda x: x)
 
             # decide whether to use hashing based on whether the self.hashed_delimiter token 
             # appears in the line before the self.autotest_delimiter token
