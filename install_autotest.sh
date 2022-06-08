@@ -14,3 +14,9 @@ cp preprocessors/execute.py $nbgrader_path/nbgrader/preprocessors
 
 cp -r nbextensions/limit_cell_height $nbgrader_path/nbgrader/nbextensions
 cp __init__.py $nbgrader_path/nbgrader
+
+
+echo "installing nbgrader extensions"
+jupyter nbextension install --sys-prefix --py nbgrader --overwrite
+jupyter nbextension enable --sys-prefix --py nbgrader
+jupyter serverextension enable --sys-prefix --py nbgrader
