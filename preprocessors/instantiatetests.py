@@ -160,6 +160,10 @@ class InstantiateTests(Execute):
 
         non_autotest_code_lines = []
 
+        if self.sanitizer is None:
+            self.log.debug('Setting sanitizer for language ' + resources['kernel_name'])
+            self.sanitizer = self.sanitizers.get(resources['kernel_name'], lambda x: x)
+
         for line in lines:
 
             # if the current line doesn't have the autotest_delimiter or is not a comment
@@ -203,10 +207,6 @@ class InstantiateTests(Execute):
                 new_lines.append(self.setup_code)
                 setup_code_inserted_into_cell = True
                 asyncio.run(self._async_execute_code_snippet(self.setup_code))
-
-            if self.sanitizer is None:
-                self.log.debug('Setting sanitizer for language ' + resources['kernel_name'])
-                self.sanitizer = self.sanitizers.get(resources['kernel_name'], lambda x: x)
 
             # decide whether to use hashing based on whether the self.hashed_delimiter token 
             # appears in the line before the self.autotest_delimiter token
@@ -257,13 +257,13 @@ class InstantiateTests(Execute):
                 # add an empty line after this block of test code
                 new_lines.append('')
 
-        # replace the cell source
-        cell.source = "\n".join(new_lines)
-
         # add the final success message
         if is_grade_flag and self.global_tests_loaded:
             if self.autotest_delimiter in cell.source:
-                cell.source += '\n' + self.success_code
+                new_lines.append(self.success_code)
+
+        # replace the cell source
+        cell.source = "\n".join(new_lines)
 
         return cell, resources
 
