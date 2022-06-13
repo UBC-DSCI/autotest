@@ -15,6 +15,14 @@ cp preprocessors/execute.py $nbgrader_path/nbgrader/preprocessors
 cp -r nbextensions/limit_cell_height $nbgrader_path/nbgrader/nbextensions
 cp __init__.py $nbgrader_path/nbgrader
 
+cp converters/generate_autotest.py $nbgrader_path/nbgrader/converters
+cp converters/__init__.py $nbgrader_path/nbgrader/converters
+cp apps/__init__.py $nbgrader_path/nbgrader/apps
+cp apps/generateautotestapp.py $nbgrader_path/nbgrader/apps
+cp apps/api.py $nbgrader_path/nbgrader/apps
+cp apps/nbgraderapp.py $nbgrader_path/nbgrader/apps
+cp coursedir.py $nbgrader_path/nbgrader
+
 
 echo "installing nbgrader extensions"
 jupyter nbextension install --sys-prefix --py nbgrader --overwrite
