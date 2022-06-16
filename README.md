@@ -9,11 +9,13 @@
 To run the demo, make sure Docker is installed on your machine, and run the following
 in the root folder of the repository:
 ```
-docker-compose up
+docker-compose up -d
 ```
 This will build a docker image, bind mount the `demo/source` and `demo/release` folders,
 and start a Jupyter notebook server. Open your browser and navigate to `localhost:8888`; 
 this should open the Jupyter notebook interface.
+
+> When you are done working, type `docker-compose down` to remove the dangling container.
 
 You will likely need to give read/write permissions to the `demo/source` and `demo/release` folders
 (so that the `jupyter` user inside the docker container can read/write to them).
