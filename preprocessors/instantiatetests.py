@@ -345,6 +345,12 @@ class InstantiateTests(Execute):
                            'and the "fail" item should store a failure message')
             raise
 
+        #
+        rendered_fail_msgs = []
+        for templ in fail_msgs:
+            template = j2.Environment(loader=j2.BaseLoader).from_string(templ)
+            rendered_fail_msgs.append(template.render(snippet=snippet))
+
         # normalize the templates
         normalized_templs = []
         for templ in test_templs:
@@ -372,7 +378,7 @@ class InstantiateTests(Execute):
             instantiated_tests.append(instantiated_test)
             test_values.append(test_value)
 
-        return instantiated_tests, test_values, fail_msgs
+        return instantiated_tests, test_values, rendered_fail_msgs
 
     # -------------------------------------------------------------------------------------
     
