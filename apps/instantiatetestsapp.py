@@ -5,7 +5,7 @@ import sys
 from traitlets import default
 
 from .baseapp import NbGrader, nbgrader_aliases, nbgrader_flags
-from ..converters import BaseConverter, GenerateAutotest, NbGraderException
+from ..converters import BaseConverter, InstantiateTests, NbGraderException
 
 aliases = {
     'course': 'CourseDirectory.course_id'
@@ -21,7 +21,7 @@ flags.update({
     'no-db': (
         {
             'SaveCells': {'enabled': False},
-            'GenerateAutotest': {'no_database': True}
+            'InstantiateTests': {'no_database': True}
         },
         "Do not save information into the database."
     ),
@@ -36,7 +36,7 @@ flags.update({
         "Do not validate or modify cell metatadata."
     ),
     'create': (
-        {'GenerateAutotest': {'create_assignment': True}},
+        {'InstantiateTests': {'create_assignment': True}},
         "Deprecated: Create an entry for the assignment in the database, if one does not already exist. "
         "This is now the default."
     ),
@@ -51,9 +51,9 @@ flags.update({
 })
 
 
-class GenerateAutotestApp(NbGrader):
+class InstantiateTestsApp(NbGrader):
 
-    name = u'nbgrader-generate-autotest'
+    name = u'nbgrader-instantiate_tests'
     description = u'Produce the version of a source with instantiated tests'
 
     aliases = aliases
@@ -102,32 +102,32 @@ class GenerateAutotestApp(NbGrader):
 
         and saved according to:
 
-            autotest/./{assignment_id}/{notebook_id}.ipynb
+            instantiated/./{assignment_id}/{notebook_id}.ipynb
 
         """
 
     @default("classes")
     def _classes_default(self):
-        classes = super(GenerateAutotestApp, self)._classes_default()
-        classes.extend([BaseConverter, GenerateAutotest])
+        classes = super(InstantiateTestsApp, self)._classes_default()
+        classes.extend([BaseConverter, InstantiateTests])
         return classes
 
     def _load_config(self, cfg, **kwargs):
         if 'AssignApp' in cfg:
             self.log.warning(
-                "Use GenerateAutotest in config, not AssignApp. Outdated config:\n%s",
+                "Use InstantiateTests in config, not AssignApp. Outdated config:\n%s",
                 '\n'.join(
                     'AssignApp.{key} = {value!r}'.format(key=key, value=value)
                     for key, value in cfg.AssignApp.items()
                 )
             )
-            cfg.GenerateAutotest.merge(cfg.AssignApp)
+            cfg.InstantiateTests.merge(cfg.AssignApp)
             del cfg.AssignApp
 
-        super(GenerateAutotestApp, self)._load_config(cfg, **kwargs)
+        super(InstantiateTestsApp, self)._load_config(cfg, **kwargs)
 
     def start(self):
-        super(GenerateAutotestApp, self).start()
+        super(InstantiateTestsApp, self).start()
 
         if len(self.extra_args) > 1:
             self.fail("Only one argument (the assignment id) may be specified")
@@ -138,7 +138,7 @@ class GenerateAutotestApp(NbGrader):
         elif len(self.extra_args) == 1:
             self.coursedir.assignment_id = self.extra_args[0]
 
-        converter = GenerateAutotest(coursedir=self.coursedir, parent=self)
+        converter = InstantiateTests(coursedir=self.coursedir, parent=self)
         try:
             converter.start()
         except NbGraderException:

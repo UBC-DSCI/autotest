@@ -10,7 +10,7 @@ from traitlets.config import LoggingConfigurable, Config
 from traitlets import Instance, Enum, Unicode, observe
 
 from ..coursedir import CourseDirectory
-from ..converters import GenerateAssignment, Autograde, GenerateFeedback, GenerateAutotest
+from ..converters import GenerateAssignment, Autograde, GenerateFeedback, InstantiateTests
 from ..exchange import ExchangeList, ExchangeReleaseAssignment, ExchangeReleaseFeedback, ExchangeFetchFeedback, ExchangeCollect, ExchangeError, ExchangeSubmit
 from ..api import MissingEntry, Gradebook, Student, SubmittedAssignment
 from ..utils import parse_utc, temp_attrs, capture_log, as_timezone, to_numeric_tz
@@ -905,8 +905,8 @@ class NbGraderAPI(LoggingConfigurable):
             app.create_assignment = create
             return capture_log(app)
 
-    def generate_autotest(self, assignment_id, force=True, create=True):
-        """Run ``nbgrader generate_autotest`` for a particular assignment.
+    def instantiate_tests(self, assignment_id, force=True, create=True):
+        """Run ``nbgrader instantiate_tests`` for a particular assignment.
 
         Arguments
         ---------
@@ -930,7 +930,7 @@ class NbGraderAPI(LoggingConfigurable):
 
         """
         with temp_attrs(self.coursedir, assignment_id=assignment_id):
-            app = GenerateAutotest(coursedir=self.coursedir, parent=self)
+            app = InstantiateTests(coursedir=self.coursedir, parent=self)
             app.force = force
             app.create_assignment = create
             return capture_log(app)

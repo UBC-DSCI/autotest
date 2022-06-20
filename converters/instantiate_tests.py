@@ -22,7 +22,7 @@ from ..preprocessors import (
 )
 
 
-class GenerateAutotest(BaseConverter):
+class InstantiateTests(BaseConverter):
 
     create_assignment = Bool(
         True,
@@ -53,7 +53,7 @@ class GenerateAutotest(BaseConverter):
 
     @property
     def _output_directory(self):
-        return self.coursedir.autotest_directory
+        return self.coursedir.instantiated_directory
 
     preprocessors = List([
         IncludeHeaderFooter,
@@ -77,19 +77,19 @@ class GenerateAutotest(BaseConverter):
     def _load_config(self, cfg, **kwargs):
         if 'Assign' in cfg:
             self.log.warning(
-                "Use GenerateAutotest in config, not Assign. Outdated config:\n%s",
+                "Use InstantiateTests in config, not Assign. Outdated config:\n%s",
                 '\n'.join(
                     'Assign.{key} = {value!r}'.format(key=key, value=value)
-                    for key, value in cfg.GenerateAutotestApp.items()
+                    for key, value in cfg.InstantiateTestsApp.items()
                 )
             )
-            cfg.GenerateAutotest.merge(cfg.Assign)
-            del cfg.GenerateAutotestApp
+            cfg.InstantiateTests.merge(cfg.Assign)
+            del cfg.InstantiateTestsApp
 
-        super(GenerateAutotest, self)._load_config(cfg, **kwargs)
+        super(InstantiateTests, self)._load_config(cfg, **kwargs)
 
     def __init__(self, coursedir=None, **kwargs):
-        super(GenerateAutotest, self).__init__(coursedir=coursedir, **kwargs)
+        super(InstantiateTests, self).__init__(coursedir=coursedir, **kwargs)
 
     def _clean_old_notebooks(self, assignment_id, student_id):
         with Gradebook(self.coursedir.db_url, self.coursedir.course_id) as gb:
@@ -129,7 +129,7 @@ class GenerateAutotest(BaseConverter):
                 gb.remove_notebook(notebook_id, assignment_id)
 
     def init_assignment(self, assignment_id, student_id):
-        super(GenerateAutotest, self).init_assignment(assignment_id, student_id)
+        super(InstantiateTests, self).init_assignment(assignment_id, student_id)
 
         # try to get the assignment from the database, and throw an error if it
         # doesn't exist
@@ -165,6 +165,6 @@ class GenerateAutotest(BaseConverter):
         old_student_id = self.coursedir.student_id
         self.coursedir.student_id = '.'
         try:
-            super(GenerateAutotest, self).start()
+            super(InstantiateTests, self).start()
         finally:
             self.coursedir.student_id = old_student_id

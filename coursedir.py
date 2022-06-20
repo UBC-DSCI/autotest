@@ -139,8 +139,8 @@ class CourseDirectory(LoggingConfigurable):
         )
     ).tag(config=True)
 
-    autotest_directory = Unicode(
-        'autotest',
+    instantiated_directory = Unicode(
+        'instantiated',
         help=dedent(
             """
             The name of the directory that contains the version of the

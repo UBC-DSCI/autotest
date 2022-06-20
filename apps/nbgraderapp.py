@@ -16,7 +16,7 @@ from . import (
     NbGrader,
     AssignApp,
     GenerateAssignmentApp,
-    GenerateAutotestApp,
+    InstantiateTestsApp,
     AutogradeApp,
     FormgradeApp,
     FeedbackApp,
@@ -109,8 +109,8 @@ class NbGraderApp(NbGrader):
                 """
             ).strip()
         ),
-        generate_autotest=(
-            GenerateAutotestApp,
+        instantiate_tests=(
+            InstantiateTestsApp,
             dedent(
                 """
                 Create the instructor version of an assignment. Intended for use by
