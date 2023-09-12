@@ -2,6 +2,9 @@
 
 ## [NbGrader](https://github.com/jupyter/nbgrader) extension for automatically generating test code.
 
+## Note: This code has been merged upstream into NbGrader itself. See https://github.com/jupyter/nbgrader/pull/1817 .
+
+
 ![autotest_demo](https://user-images.githubusercontent.com/5981307/170394669-37f7f22b-00fd-441d-9a5e-f82761835f89.gif)
 
 
